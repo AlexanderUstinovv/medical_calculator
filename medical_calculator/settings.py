@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_yasg',
-    'body_mass_calculator'
+    'body_mass_calculator',
+    'api'
 ]
 
 REST_FRAMEWORK = {
