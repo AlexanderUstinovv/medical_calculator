@@ -6,3 +6,4 @@ djangorestframework-jwt-refresh-token==0.5
 PyJWT==1.7.1
 pytz==2019.3
 sqlparse==0.3.1
+git+https://github.com/AlexanderUstinovv/body_mass_calculator

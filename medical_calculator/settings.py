@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'body_mass_calculator'
 ]
 
 REST_FRAMEWORK = {
