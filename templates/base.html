@@ -2,25 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Главная{% endblock %}</title>
+    <title>{% block title %}{% endblock %}</title>
     {% load bootstrap4 %}
     {% bootstrap_css %}
     {% bootstrap_javascript jquery='full' %}
-        <!--  TODO: Remove it to css file, reformat this template and send to auth folder   -->
     <style>
-            body,html{height:100%;}
+        {% block style %}{% endblock %}
     </style>
 </head>
 <body>
-    <div class="container h-100">
-        <div class="row h-100 justify-content-center align-items-center">
-            <div class="col-12">
-                <h1>Введите учётные данные</h1>
-                {% autoescape on %}
-                    {% block content %}{% endblock %}
-                {% endautoescape %}
-            </div>
-        </div>
-    </div>
+    {% autoescape on %}
+        {% block content %}{% endblock %}
+    {% endautoescape %}
 </body>
 </html>

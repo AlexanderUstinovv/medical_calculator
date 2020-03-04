@@ -1,0 +1,16 @@
+{% extends "../base.html" %}
+
+{% block style %}
+    body,html{height:100%;}
+{% endblock %}
+
+{% block content %}
+    <div class="container h-100">
+        <div class="row h-100 justify-content-center align-items-center">
+            <div class="col-12">
+                <h1>{% block header %}{% endblock %}</h1>
+                {% block auth_form %}{% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

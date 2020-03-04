@@ -1,14 +1,13 @@
-{% extends "../base.html" %}
+{% extends "auth/base.html" %}
 
 {% load crispy_forms_tags %}
 {% block title %} Войти {% endblock %}
 
-{% block content %}
-
+{% block header %}Введите учётные данные{% endblock %}
+{% block auth_form %}
     <form method="post">
         {% csrf_token %}
         {{ form|crispy }}
-        <button type="submit" class="btn btn-success">Login</button>
+        <button type="submit" class="btn btn-success">Войти</button>
     </form>
-
-{% endblock%}
+{% endblock %}
