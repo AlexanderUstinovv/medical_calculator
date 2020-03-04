@@ -6,6 +6,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 from api import urls as api_urls
+from web import urls as web_urls
 from auth import urls as auth_urls
 
 schema_view = get_schema_view(
@@ -27,5 +28,6 @@ urlpatterns = [
     path(r'auth/', include((auth_urls, 'auth'), namespace='auth')),
     path(r'redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path(r'swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path(r'swagger(?P<format>\.json|\.yaml)/', schema_view.without_ui(cache_timeout=0), name='schema-json')
+    path(r'swagger(?P<format>\.json|\.yaml)/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path(r'', include((web_urls, 'web'), namespace='web')),
 ]

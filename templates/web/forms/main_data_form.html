@@ -1,0 +1,12 @@
+{% extends "web/forms/base.html" %}
+
+{% load crispy_forms_tags %}
+{% block title %} Заполните данные {% endblock %}
+
+{% block web_form %}
+    <form method="post" action="{% url 'web:main-data' %}">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success">Сохранить</button>
+    </form>
+{% endblock %}

@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'bootstrap4',
     'crispy_forms',
     'body_mass_calculator',
-    'api'
+    'api',
+    'web'
 ]
 
 REST_FRAMEWORK = {
