@@ -1,10 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "web/base.html" %}
 
-</body>
-</html>
+{% block main %}
+    <div class="container h-100">
+        <div class="row h-100 justify-content-center align-items-center">
+            <div class="col-12 mt-5">
+                <h1>Индекс массы тела, рекомендации и сатус</h1>
+                {% include 'web/app_parts/body_mass_index.html' %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
