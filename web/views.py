@@ -21,30 +21,33 @@ class MainView(LoginRequiredMixin, TemplateView):
 
 
 class MainDataView(LoginRequiredMixin, FormView):
+
     template_name = 'web/forms/main_data_form.html'
     success_url = reverse_lazy('web:main')
     form_class = MainDataForm
 
-    # TODO: fix form validation
-    def form_valid(self, form):
-        user = self.request.user
-        form_data = form.cleaned_data
-        person_data = MainPersonData.objects.filter(person=user)
-        if person_data.exists():
-            person_data.update(
-                name=form_data.get('name'),
-                age=form_data.get('age'),
-                sex=form_data.get('sex'),
-                height=form_data.get('height'),
-                weight=form_data.get('weight')
-            )
-        else:
-            MainPersonData.objects.create(
-                person=user,
-                name=form_data.get('name'),
-                age=form_data.get('age'),
-                sex=form_data.get('sex'),
-                height=form_data.get('height'),
-                weight=form_data.get('weight')
-            )
-        return super().form_valid(form)
+    def post(self, request, *args, **kwargs):
+        form = MainDataForm(data=request.POST)
+        if form.is_valid():
+            user = self.request.user
+            form_data = form.cleaned_data
+            person_data = MainPersonData.objects.filter(person=user)
+            if person_data.exists():
+                person_data = person_data.first()
+                person_data.name = form_data.get('name')
+                person_data.age = form_data.get('age')
+                person_data.sex = form_data.get('sex')
+                person_data.height = form_data.get('height')
+                person_data.weight = form_data.get('weight')
+                person_data.save()
+            else:
+                MainPersonData.objects.create(
+                    person=user,
+                    name=form_data.get('name'),
+                    age=form_data.get('age'),
+                    sex=form_data.get('sex'),
+                    height=form_data.get('height'),
+                    weight=form_data.get('weight')
+                )
+
+        return super().post(request, *args, **kwargs)
