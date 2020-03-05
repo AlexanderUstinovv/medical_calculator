@@ -1,12 +1,13 @@
 from body_mass_calculator.forms import MainDataForm
 from body_mass_calculator.models import MainPersonData, BodyMassIndex
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView
 
 DEFAULT_BODY_MASS_INDEX = 0
 
 
-class MainView(TemplateView):
+class MainView(LoginRequiredMixin, TemplateView):
     template_name = 'web/main.html'
 
     def get_context_data(self, **kwargs):
@@ -19,7 +20,7 @@ class MainView(TemplateView):
         return context
 
 
-class MainDataView(FormView):
+class MainDataView(LoginRequiredMixin, FormView):
     template_name = 'web/forms/main_data_form.html'
     success_url = reverse_lazy('web:main')
     form_class = MainDataForm
