@@ -26,6 +26,13 @@ class MainDataView(LoginRequiredMixin, FormView):
     success_url = reverse_lazy('web:main')
     form_class = MainDataForm
 
+    def get_initial(self):
+        user = self.request.user
+        person_data = MainPersonData.objects.filter(person=user)
+        if person_data.exists():
+            return person_data.values().first()
+        return super().get_initial()
+
     def post(self, request, *args, **kwargs):
         form = MainDataForm(data=request.POST)
         if form.is_valid():
@@ -49,5 +56,4 @@ class MainDataView(LoginRequiredMixin, FormView):
                     height=form_data.get('height'),
                     weight=form_data.get('weight')
                 )
-
         return super().post(request, *args, **kwargs)
