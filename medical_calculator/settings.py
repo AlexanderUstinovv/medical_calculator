@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'crispy_forms',
     'body_mass_calculator',
+    'medical_test',
     'api',
     'web'
 ]

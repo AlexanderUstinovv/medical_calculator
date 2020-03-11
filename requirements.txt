@@ -32,3 +32,4 @@ sqlparse==0.3.1
 uritemplate==3.0.1
 urllib3==1.25.8
 git+https://github.com/AlexanderUstinovv/body_mass_calculator
+git+https://github.com/AlexanderUstinovv/medical_test.git

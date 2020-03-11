@@ -1,8 +1,12 @@
 from body_mass_calculator.forms import MainDataForm
 from body_mass_calculator.models import MainPersonData, BodyMassIndex
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView
+from medical_test.form_generator import generate_form_by_recommendation
+from medical_test.models import MedicalProcedure
+from medical_test.recommendations import recommend_medical_test
 
 DEFAULT_BODY_MASS_INDEX = 0
 
@@ -17,11 +21,18 @@ class MainView(LoginRequiredMixin, TemplateView):
         body_mass_index = BodyMassIndex.objects.filter(person=user)
         if body_mass_index.exists():
             context['body_mass_index'] = body_mass_index.first().value
+        main_data = MainPersonData.objects.filter(person=user)
+        context['recommended'] = []
+        if main_data.exists():
+            recommended = recommend_medical_test(main_data.first().sex,
+                                                 main_data.first().age)
+            for item in recommended:
+                context['recommended'].append(
+                    {'name': item.name, 'id': item.id})
         return context
 
 
 class MainDataView(LoginRequiredMixin, FormView):
-
     template_name = 'web/forms/main_data_form.html'
     success_url = reverse_lazy('web:main')
     form_class = MainDataForm
@@ -57,3 +68,15 @@ class MainDataView(LoginRequiredMixin, FormView):
                     weight=form_data.get('weight')
                 )
         return super().post(request, *args, **kwargs)
+
+
+class MedicalTest(LoginRequiredMixin, TemplateView):
+    template_name = 'web/forms/parameter_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        medical_procedure = get_object_or_404(MedicalProcedure,
+                                              pk=kwargs.get('test_id'))
+        context['form'] = generate_form_by_recommendation(
+            medical_procedure)
+        return context

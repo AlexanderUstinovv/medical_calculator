@@ -1,0 +1,17 @@
+{% block recommendations %}
+    <div class="row">
+        <div class="col-sm">
+            <p class="h4 mt-5 mb-3">Рекомендации</p>
+                <div class="row">
+                    {% for item in recommended %}
+                        <div class="col-sm">
+                            <span class="h6">{{ item.name }}</span>
+                        </div>
+                        <div class="col-sm">
+                            <a class="btn btn-primary"href="{% url 'web:medical-test' test_id=item.id %}" role="button">Заполнить</a>
+                        </div>
+                    {% endfor %}
+                </div>
+        </div>
+    </div>
+{% endblock %}
