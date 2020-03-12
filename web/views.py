@@ -7,13 +7,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from body_mass_calculator.forms import MainDataForm
 from body_mass_calculator.models import MainPersonData, BodyMassIndex
 
-from medical_test.models import MedicalProcedure
 from medical_test.form_handler import handle_parameter_form
 from medical_test.recommendations import recommend_medical_test
 from medical_test.form_generator import generate_form_by_recommendation
+from medical_test.models import MedicalProcedure, MedicalProcedureResult
 
 MAIN_URL = reverse_lazy('web:main')
 DEFAULT_BODY_MASS_INDEX = 0
+STATUS_TRUE = 'Все показания в норме'
+STATUS_FALSE = 'Обнаружены отклонения, необходимо обратиться к специалисту'
 
 
 class MainView(LoginRequiredMixin, TemplateView):
@@ -28,6 +30,11 @@ class MainView(LoginRequiredMixin, TemplateView):
             context['body_mass_index'] = body_mass_index.first().value
         main_data = MainPersonData.objects.filter(person=user)
         context['recommended'] = []
+        medical_results = MedicalProcedureResult.objects.filter(user=user)
+        if False in [item.result for item in medical_results]:
+            context['status'] = STATUS_FALSE
+        else:
+            context['status'] = STATUS_TRUE
         if main_data.exists():
             recommended = recommend_medical_test(main_data.first().sex,
                                                  main_data.first().age)
