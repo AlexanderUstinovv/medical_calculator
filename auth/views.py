@@ -48,4 +48,6 @@ class RegistrationView(FormView):
                 user = User(username=name)
                 user.set_password(password_1)
                 user.save()
-        return super().post(request, *args, **kwargs)
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
