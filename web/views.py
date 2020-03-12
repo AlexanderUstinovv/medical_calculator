@@ -1,13 +1,18 @@
+from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, render
+from django.views.generic import FormView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from body_mass_calculator.forms import MainDataForm
 from body_mass_calculator.models import MainPersonData, BodyMassIndex
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
-from django.views.generic import FormView, TemplateView
-from medical_test.form_generator import generate_form_by_recommendation
-from medical_test.models import MedicalProcedure
-from medical_test.recommendations import recommend_medical_test
 
+from medical_test.models import MedicalProcedure
+from medical_test.form_handler import handle_parameter_form
+from medical_test.recommendations import recommend_medical_test
+from medical_test.form_generator import generate_form_by_recommendation
+
+MAIN_URL = reverse_lazy('web:main')
 DEFAULT_BODY_MASS_INDEX = 0
 
 
@@ -34,7 +39,7 @@ class MainView(LoginRequiredMixin, TemplateView):
 
 class MainDataView(LoginRequiredMixin, FormView):
     template_name = 'web/forms/main_data_form.html'
-    success_url = reverse_lazy('web:main')
+    success_url = MAIN_URL
     form_class = MainDataForm
 
     def get_initial(self):
@@ -73,10 +78,21 @@ class MainDataView(LoginRequiredMixin, FormView):
 class MedicalTest(LoginRequiredMixin, TemplateView):
     template_name = 'web/forms/parameter_form.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get(self, request, *args, **kwargs):
+        context = {}
         medical_procedure = get_object_or_404(MedicalProcedure,
                                               pk=kwargs.get('test_id'))
         context['form'] = generate_form_by_recommendation(
             medical_procedure)
-        return context
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        post_dict = self.request.POST.dict()
+        post_dict.pop('csrfmiddlewaretoken')
+        post_dict = {key: float(value) for (key, value) in post_dict.items()}
+        user = self.request.user
+        sex = MainPersonData.objects.get(person=user).sex
+        medical_procedure_id = kwargs.get('test_id')
+        handle_parameter_form(user, sex,
+                              medical_procedure_id, post_dict)
+        return HttpResponseRedirect(MAIN_URL)

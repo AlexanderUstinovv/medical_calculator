@@ -4,7 +4,7 @@
 {% block title %} Заполните данные {% endblock %}
 
 {% block web_form %}
-    <form method="post" action="{% url 'web:main-data' %}">
+    <form method="post">
         {% csrf_token %}
         {{ form|crispy }}
         <button type="submit" class="btn btn-success">Сохранить</button>
