@@ -1,19 +1,23 @@
 {% block nav_bar %}
-    <nav class="navbar navbar-dark bg-dark">
+    <nav class="navbar navbar-dark bg-dark navbar-expand-sm">
         <a class="navbar-brand" href="#">Logo</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-list-5">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
+        <div class="collapse navbar-collapse" id="navbar-list-5">
+            <ul class="navbar-nav ml-auto">
                 <li class="nav-item active">
                     <a class="nav-link" href="{% url 'web:main-data' %}">Основные данные</a>
                 </li>
+                <li class="nav-item active">
+                    <span class="nav-link">{{ user.username }}</span>
+                </li>
+                <li>
+                    <form class="form-inline my-2 my-lg-0" action="{% url 'auth:logout' %}">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Выход</button>
+                    </form>
+                </li>
             </ul>
-            <form class="form-inline my-2 my-lg-0" action="{% url 'auth:logout' %}">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Выход</button>
-            </form>
         </div>
     </nav>
 {% endblock %}
