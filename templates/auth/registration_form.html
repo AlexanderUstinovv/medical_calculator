@@ -4,6 +4,11 @@
 {% block title %} Регистрация {% endblock %}
 
 {% block header %}Заполните учётные данные{% endblock %}
+
+{% block nav_bar %}
+    {% include 'auth/app_parts/nav_bar_login.html' %}
+{% endblock %}
+
 {% block auth_form %}
     <form method="post">
         {% csrf_token %}

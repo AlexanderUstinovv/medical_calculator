@@ -1,0 +1,8 @@
+{% block nav_bar %}
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Logo</a>
+        <form method="get" class="form-inline my-2 my-lg-0" action="{% url 'auth:form-registration' %}">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Регистрация</button>
+        </form>
+    </nav>
+{% endblock %}
