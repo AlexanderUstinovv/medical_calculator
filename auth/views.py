@@ -3,17 +3,26 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
-from django.core.exceptions import ValidationError
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import FormView
+
+MAIN_PAGE = reverse_lazy('web:main')
 
 
 class LoginView(FormView):
     template_name = 'auth/login_form.html'
     form_class = AuthenticationForm
-    success_url = reverse_lazy('web:main')
+    success_url = MAIN_PAGE
+
+    def get(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect(MAIN_PAGE)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            redirect(self.get_success_url())
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             name = form.cleaned_data.get('username')
@@ -21,11 +30,8 @@ class LoginView(FormView):
             user = authenticate(username=name, password=password)
             if user.is_active:
                 login(request, user)
-                return super().post(request, *args, **kwargs)
-            else:
-                raise ValidationError('Account is not activated')
-        else:
-            raise ValidationError('Authentication failed')
+                return self.form_valid(form)
+        return self.form_invalid(form)
 
 
 class SystemLogoutView(LogoutView):
@@ -36,6 +42,11 @@ class RegistrationView(FormView):
     template_name = 'auth/registration_form.html'
     form_class = UserCreationForm
     success_url = reverse_lazy('auth:form-login')
+
+    def get(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect(MAIN_PAGE)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         form = UserCreationForm(request.POST)
