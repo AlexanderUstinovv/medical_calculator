@@ -1,6 +1,5 @@
 asgiref==3.2.3
 beautifulsoup4==4.8.2
-body-mass-calculator==0.3
 certifi==2019.11.28
 chardet==3.0.4
 coreapi==2.3.3
