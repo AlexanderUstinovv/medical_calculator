@@ -12,6 +12,8 @@ from medical_test.recommendations import recommend_medical_test
 from medical_test.form_generator import generate_form_by_recommendation
 from medical_test.models import MedicalProcedure, MedicalProcedureResult
 
+from .cardio_risk import get_risk_status
+
 MAIN_URL = reverse_lazy('web:main')
 DEFAULT_BODY_MASS_INDEX = 0
 STATUS_TRUE = 'Все показания в норме'
@@ -35,6 +37,7 @@ class MainView(LoginRequiredMixin, TemplateView):
             context['status'] = STATUS_FALSE
         else:
             context['status'] = STATUS_TRUE
+        context['cardio_risk'] = get_risk_status(user)
         if main_data.exists():
             recommended = recommend_medical_test(main_data.first().sex,
                                                  main_data.first().age)
@@ -69,6 +72,7 @@ class MainDataView(LoginRequiredMixin, FormView):
                 person_data.sex = form_data.get('sex')
                 person_data.height = form_data.get('height')
                 person_data.weight = form_data.get('weight')
+                person_data.smoking = form_data.get('smoking')
                 person_data.save()
             else:
                 MainPersonData.objects.create(
@@ -77,7 +81,8 @@ class MainDataView(LoginRequiredMixin, FormView):
                     age=form_data.get('age'),
                     sex=form_data.get('sex'),
                     height=form_data.get('height'),
-                    weight=form_data.get('weight')
+                    weight=form_data.get('weight'),
+                    smoking=form_data.get('smoking')
                 )
         return super().post(request, *args, **kwargs)
 
