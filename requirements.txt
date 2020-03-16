@@ -30,5 +30,7 @@ soupsieve==2.0
 sqlparse==0.3.1
 uritemplate==3.0.1
 urllib3==1.25.8
-git+https://github.com/AlexanderUstinovv/body_mass_calculator
+psycopg2==2.8.4
+gunicorn==20.0.4
+git+https://github.com/AlexanderUstinovv/body_mass_calculator.git
 git+https://github.com/AlexanderUstinovv/medical_test.git
