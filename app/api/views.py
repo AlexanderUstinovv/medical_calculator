@@ -1,4 +1,5 @@
-from rest_framework import generics
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,11 +7,14 @@ from rest_framework.views import APIView
 from body_mass_calculator.models import MainPersonData, BodyMassIndex
 from medical_test.recommendations import recommend_medical_test
 
-from medical_test.models import Parameter
+from medical_test.models import MedicalProcedure
+from medical_test.models import Parameter, MedicalProcedureResult
+from medical_test.models import ParameterValue
 
 from .serializers import MainPersonDataSerializer
 from .serializers import BodyMassIndexSerializer
 from .serializers import RecommendationsSerializer
+from .serializers import UserMedicalProceduresSerializer
 
 from .request_object.recommendation import Parameter as ResponseParameter
 from .request_object.recommendation import Recommendations
@@ -68,6 +72,7 @@ class BodyMassDataView(generics.RetrieveAPIView):
 class ListRecommendations(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(responses={200: RecommendationsSerializer(many=True)})
     def get(self, request):
         user = self.request.user
         main_data = MainPersonData.objects.filter(person=user)
@@ -89,3 +94,60 @@ class ListRecommendations(APIView):
             recommendations=recommendations)
         serializer = RecommendationsSerializer(recommendations_object)
         return Response(serializer.data)
+
+
+def get_or_create_procedure_result(procedure_id: int, user):
+    med_proc = MedicalProcedure.objects.get(id=procedure_id)
+    medical_result = MedicalProcedureResult.objects.filter(
+        medical_procedure=med_proc,
+        user=user
+    )
+    if medical_result.exists():
+        return medical_result.first()
+    return MedicalProcedureResult.objects.create(
+        medical_procedure=MedicalProcedure.objects.get(id=procedure_id),
+        user=user,
+        value=0
+    )
+
+
+def update_or_create_parameter(procedure_result: MedicalProcedureResult,
+                               parameter_id: int,
+                               value: float):
+    parameter_value = ParameterValue.objects.filter(
+        medical_procedure_result=procedure_result,
+        parameter__pk=parameter_id
+    )
+
+    if parameter_value.exists():
+        parameter_value.update(value=value)
+    else:
+        ParameterValue.objects.create(
+            medical_procedure_result=procedure_result,
+            parameter=Parameter.objects.get(id=parameter_id),
+            value=value
+        )
+
+
+class RecommendationParameterValues(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(responses={201: UserMedicalProceduresSerializer(many=True)})
+    def post(self, request):
+        user = self.request.user
+        serializer = UserMedicalProceduresSerializer(
+            data=request.data)
+        if serializer.is_valid():
+            data = dict(serializer.validated_data)
+            valid_data = [dict(item) for item in data.get('procedures', [])]
+            for item in valid_data:
+                procedure = get_or_create_procedure_result(item.get('id'), user)
+                for param in item.get('parameters'):
+                    param = dict(param)
+                    update_or_create_parameter(
+                        procedure,
+                        param.get('id'),
+                        param.get('value')
+                    )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

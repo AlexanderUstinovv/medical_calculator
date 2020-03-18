@@ -59,3 +59,17 @@ class RecommendationSerializer(serializers.Serializer):
 
 class RecommendationsSerializer(serializers.Serializer):
     recommendations = serializers.ListField(child=RecommendationSerializer())
+
+
+class UserParameterSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    value = serializers.FloatField()
+
+
+class UserMedicalProcedureSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    parameters = serializers.ListField(child=UserParameterSerializer())
+
+
+class UserMedicalProceduresSerializer(serializers.Serializer):
+    procedures = serializers.ListField(child=UserMedicalProcedureSerializer())
