@@ -1,9 +1,20 @@
-from body_mass_calculator.models import MainPersonData, BodyMassIndex
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .serializers import MainPersonDataSerializer, BodyMassIndexSerializer
+from body_mass_calculator.models import MainPersonData, BodyMassIndex
+from medical_test.recommendations import recommend_medical_test
+
+from medical_test.models import Parameter
+
+from .serializers import MainPersonDataSerializer
+from .serializers import BodyMassIndexSerializer
+from .serializers import RecommendationsSerializer
+
+from .request_object.recommendation import Parameter as ResponseParameter
+from .request_object.recommendation import Recommendations
+from .request_object.recommendation import Recommendation
 
 
 class MainPersonDataRudView(generics.mixins.CreateModelMixin,
@@ -52,3 +63,29 @@ class BodyMassDataView(generics.RetrieveAPIView):
     def get_object(self):
         user = self.request.user
         return BodyMassIndex.objects.get(person=user)
+
+
+class ListRecommendations(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = self.request.user
+        main_data = MainPersonData.objects.filter(person=user)
+        procedures = recommend_medical_test(main_data.first().sex,
+                                            main_data.first().age)
+        recommendations = []
+        for procedure in procedures:
+            parameters = Parameter.objects.filter(
+                medical_procedure=procedure
+            )
+            params = [ResponseParameter(item.id,
+                                        item.name,
+                                        item.measurement.name)
+                      for item in parameters]
+            recommendations.append(Recommendation(procedure.id,
+                                                  procedure.name,
+                                                  params))
+        recommendations_object = Recommendations(
+            recommendations=recommendations)
+        serializer = RecommendationsSerializer(recommendations_object)
+        return Response(serializer.data)

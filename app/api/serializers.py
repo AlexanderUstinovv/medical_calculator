@@ -43,3 +43,19 @@ class BodyMassIndexSerializer(serializers.ModelSerializer):
         model = BodyMassIndex
         serializer_class = ['person', 'value']
         fields = ['person', 'value']
+
+
+class ParameterSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField(max_length=255)
+    measurement = serializers.CharField(max_length=10)
+
+
+class RecommendationSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField(max_length=255)
+    parameters = serializers.ListField(child=ParameterSerializer())
+
+
+class RecommendationsSerializer(serializers.Serializer):
+    recommendations = serializers.ListField(child=RecommendationSerializer())
